@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// src/App.tsx
+import React, { useState } from 'react';
+import DateRangePicker from './components/DateRangePicker';
+import TimeSeriesChart from './components/TimeSeriesChart';
+import ColumnChart from './components/ColumnChart';
+import SparklineChart from './components/SparklineChart';
+import { bookingData } from './api/data';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [filteredData, setFilteredData] = useState(bookingData);
+
+    const handleDateChange = (startDate: Date, endDate: Date) => {
+        const filtered = bookingData.filter(item => {
+            const arrivalDate = new Date(item.arrival_date);
+            return arrivalDate >= startDate && arrivalDate <= endDate;
+        });
+        setFilteredData(filtered);
+    };
+
+    return (
+        <div className="App">
+            <h1>Hotel Booking Dashboard</h1>
+            <DateRangePicker onChange={handleDateChange} />
+            <TimeSeriesChart data={filteredData.map(item => item.adults + item.children + item.babies)} />
+            <ColumnChart data={filteredData} /> {/* Ensure this is an array */}
+            <SparklineChart data={filteredData.map(item => item.adults)} />
+            <SparklineChart data={filteredData.map(item => item.children)} />
+        </div>
+    );
+};
 
 export default App;
